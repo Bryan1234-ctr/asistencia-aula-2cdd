@@ -2,7 +2,14 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#1F4E79">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Asistencia">
+    <link rel="manifest" href="/static/manifest.json">
+    <link rel="apple-touch-icon" href="/static/icon-192.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/static/icon-192.png">
     <title>Asistencia 2 CDD "A" — < 60 segundos</title>
     <style>
         :root {
@@ -146,7 +153,6 @@
             max-width: 320px;
         }
         .toast.show { opacity: 1; }
-        .disabled { opacity: 0.5; pointer-events: none; }
         @media (max-width: 600px) {
             .header h1 { font-size: 1.1rem; }
             td, th { padding: 6px 4px; font-size: 0.8rem; }
@@ -254,16 +260,13 @@
                 const res = await fetch('/api/iniciar-sesion', { method: 'POST' });
                 const data = await res.json();
                 if (!res.ok) throw new Error(data.detail || 'Error');
-                
                 showToast(data.mensaje);
                 sesionActiva = true;
                 startTime = Date.now();
                 timerInterval = setInterval(updateTimer, 500);
-                
                 document.getElementById('btnIniciar').disabled = true;
                 document.getElementById('btnCerrar').disabled = false;
                 document.getElementById('estadoSesion').textContent = 'Activa';
-                
                 document.querySelectorAll('.estado-cell').forEach(cell => {
                     cell.innerHTML = '<span class="badge badge-A">A</span>';
                 });
@@ -286,14 +289,12 @@
                     const now = new Date();
                     form.append('hora_llegada', now.toTimeString().slice(0,5));
                 }
-
                 const res = await fetch('/api/marcar', { method: 'POST', body: form });
                 const data = await res.json();
                 if (!res.ok) throw new Error(data.detail || 'Error');
-
                 const row = document.querySelector(`tr[data-id="${estudianteId}"]`);
                 if (row) {
-                    row.querySelector('.estado-cell').innerHTML = 
+                    row.querySelector('.estado-cell').innerHTML =
                         `<span class="badge badge-${estado}">${estado}</span>`;
                 }
                 updateCounts();
@@ -321,21 +322,18 @@
                 const res = await fetch('/api/cerrar-sesion', { method: 'POST' });
                 const data = await res.json();
                 if (!res.ok) throw new Error(data.detail || 'Error');
-
                 clearInterval(timerInterval);
                 sesionActiva = false;
                 document.getElementById('btnCerrar').disabled = true;
                 document.getElementById('estadoSesion').textContent = 'Cerrada';
-
                 const r = data.resumen;
                 document.getElementById('resumenFinal').style.display = 'grid';
                 document.getElementById('resA').textContent = r.asistencias;
                 document.getElementById('resFJ').textContent = r.faltas_justificadas;
                 document.getElementById('resFI').textContent = r.faltas_injustificadas;
                 document.getElementById('resAT').textContent = r.atrasos;
-
                 let msg = `Sesión cerrada. A:${r.asistencias} FJ:${r.faltas_justificadas} FI:${r.faltas_injustificadas} AT:${r.atrasos}`;
-                if (r.tiempo_segundos !== null && r.tiempo_segundos !== undefined) {
+                if (r.tiempo_segundos != null) {
                     msg += ` | Tiempo: ${r.tiempo_segundos}s`;
                     if (r.tiempo_segundos <= 60) msg += ' ✅ ¡Objetivo cumplido!';
                 }
@@ -361,7 +359,7 @@
                     data.registros.forEach(r => {
                         const row = document.querySelector(`tr[data-id="${r.estudiante_id}"]`);
                         if (row) {
-                            row.querySelector('.estado-cell').innerHTML = 
+                            row.querySelector('.estado-cell').innerHTML =
                                 `<span class="badge badge-${r.estado}">${r.estado}</span>`;
                         }
                     });
@@ -369,6 +367,10 @@
                 }
             } catch(e) {}
         })();
+
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/static/sw.js').catch(() => {});
+        }
     </script>
 </body>
 </html>

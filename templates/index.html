@@ -3,374 +3,235 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="theme-color" content="#1F4E79">
+    <meta name="theme-color" content="#0F172A">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Asistencia">
+    <meta name="apple-mobile-web-app-title" content="RapidoLista">
     <link rel="manifest" href="/static/manifest.json">
-    <link rel="apple-touch-icon" href="/static/icon-192.png">
     <link rel="icon" type="image/png" sizes="192x192" href="/static/icon-192.png">
-    <title>Asistencia 2 CDD "A" — < 60 segundos</title>
+    <title>RapidoLista · 2 CDD A</title>
     <style>
         :root {
-            --primary: #1F4E79;
-            --success: #27AE60;
-            --warning: #F39C12;
-            --danger: #E74C3C;
-            --info: #3498DB;
-            --bg: #F4F6F7;
-            --card: #FFFFFF;
+            --bg: #0F172A;
+            --surface: #1E293B;
+            --surface2: #334155;
+            --text: #F8FAFC;
+            --muted: #94A3B8;
+            --accent: #38BDF8;
+            --ok: #34D399;
+            --bad: #F87171;
+            --late: #FB923C;
+            --radius: 14px;
+            --font: "Segoe UI", system-ui, -apple-system, sans-serif;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            font-family: 'Segoe UI', system-ui, sans-serif;
-            background: var(--bg);
-            color: #333;
-            line-height: 1.4;
-        }
-        .header {
-            background: var(--primary);
-            color: white;
-            padding: 12px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        .header h1 { font-size: 1.3rem; }
-        .header .meta { font-size: 0.85rem; opacity: 0.9; }
-        .container { max-width: 1100px; margin: 0 auto; padding: 16px; }
-        .actions {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-bottom: 16px;
-            align-items: center;
-        }
-        button {
-            border: none;
-            padding: 10px 18px;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 0.95rem;
-            transition: transform 0.1s;
-        }
+        body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100dvh; line-height: 1.35; }
+        .top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 18px; background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%); border-bottom: 1px solid #334155; position: sticky; top: 0; z-index: 20; }
+        .brand h1 { font-size: 1.15rem; font-weight: 700; letter-spacing: -0.02em; }
+        .brand h1 span { color: var(--accent); }
+        .brand .sub { font-size: 0.75rem; color: var(--muted); }
+        .timer-box { text-align: right; }
+        .timer-box .label { font-size: 0.65rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+        .timer-box .value { font-size: 1.6rem; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--accent); }
+        .timer-box .value.over { color: var(--bad); }
+        .controls { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 18px; background: var(--surface); border-bottom: 1px solid #334155; }
+        button { border: none; border-radius: 10px; padding: 10px 16px; font-weight: 600; font-size: 0.88rem; cursor: pointer; font-family: inherit; transition: transform 0.1s, opacity 0.15s; }
         button:active { transform: scale(0.97); }
-        .btn-primary { background: var(--primary); color: white; }
-        .btn-success { background: var(--success); color: white; }
-        .btn-warning { background: var(--warning); color: white; }
-        .btn-danger { background: var(--danger); color: white; }
-        .btn-secondary { background: #95A5A6; color: white; }
-        .status-bar {
-            background: var(--card);
-            border-radius: 8px;
-            padding: 12px 16px;
-            margin-bottom: 16px;
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-            font-size: 0.9rem;
-        }
-        .status-bar .item strong { color: var(--primary); }
-        .timer {
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: var(--primary);
-            font-variant-numeric: tabular-nums;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: var(--card);
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-        }
-        th {
-            background: var(--primary);
-            color: white;
-            padding: 10px 8px;
-            text-align: left;
-            font-size: 0.85rem;
-        }
-        td {
-            padding: 8px;
-            border-bottom: 1px solid #EEE;
-            font-size: 0.9rem;
-        }
-        tr:hover { background: #F8FBFF; }
-        .num { width: 40px; text-align: center; font-weight: 600; }
-        .estado-btns { display: flex; gap: 4px; flex-wrap: wrap; }
-        .estado-btns button {
-            padding: 5px 10px;
-            font-size: 0.8rem;
-            min-width: 36px;
-        }
-        .estado-A { background: #D5F5E3; color: #1E8449; }
-        .estado-FJ { background: #FCF3CF; color: #9A7D0A; }
-        .estado-FI { background: #FADBD8; color: #922B21; }
-        .estado-AT { background: #FDEBD0; color: #B9770E; }
-        .badge {
-            display: inline-block;
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-size: 0.75rem;
-            font-weight: 700;
-        }
-        .badge-A { background: #27AE60; color: white; }
-        .badge-FJ { background: #F1C40F; color: #333; }
-        .badge-FI { background: #E74C3C; color: white; }
-        .badge-AT { background: #E67E22; color: white; }
-        .resumen {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 12px;
-            margin-top: 16px;
-        }
-        .resumen .card {
-            background: var(--card);
-            border-radius: 8px;
-            padding: 14px;
-            text-align: center;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-        }
-        .resumen .card .num { font-size: 1.8rem; font-weight: 700; }
-        .resumen .card .label { font-size: 0.8rem; color: #666; margin-top: 4px; }
-        .toast {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: #2C3E50;
-            color: white;
-            padding: 12px 20px;
-            border-radius: 8px;
-            opacity: 0;
-            transition: opacity 0.3s;
-            z-index: 100;
-            max-width: 320px;
-        }
-        .toast.show { opacity: 1; }
-        @media (max-width: 600px) {
-            .header h1 { font-size: 1.1rem; }
-            td, th { padding: 6px 4px; font-size: 0.8rem; }
-            .estado-btns button { padding: 4px 7px; font-size: 0.75rem; }
-        }
+        button:disabled { opacity: 0.4; cursor: not-allowed; }
+        .btn-go { background: var(--accent); color: #0F172A; }
+        .btn-done { background: var(--ok); color: #022C22; }
+        .btn-ghost { background: var(--surface2); color: var(--text); }
+        .kpis { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1px; background: #334155; border-bottom: 1px solid #334155; }
+        .kpi { background: var(--surface); padding: 10px 6px; text-align: center; }
+        .kpi .n { font-size: 1.25rem; font-weight: 800; }
+        .kpi .l { font-size: 0.65rem; color: var(--muted); text-transform: uppercase; }
+        .kpi.a .n { color: var(--ok); }
+        .kpi.at .n { color: var(--late); }
+        .kpi.fj .n { color: #A78BFA; }
+        .kpi.fi .n { color: var(--bad); }
+        .grid-wrap { padding: 14px 14px 100px; }
+        .hint { font-size: 0.8rem; color: var(--muted); margin-bottom: 12px; padding: 0 4px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+        .card { background: var(--surface); border-radius: var(--radius); padding: 12px; border: 2px solid transparent; transition: border-color 0.15s, background 0.15s; }
+        .card[data-estado="A"] { border-color: #065F46; background: #022C22; }
+        .card[data-estado="AT"] { border-color: #9A3412; background: #431407; }
+        .card[data-estado="FJ"] { border-color: #5B21B6; background: #2E1065; }
+        .card[data-estado="FI"] { border-color: #9F1239; background: #4C0519; }
+        .card .num { font-size: 0.7rem; color: var(--muted); font-weight: 600; }
+        .card .name { font-size: 0.82rem; font-weight: 600; margin: 4px 0 8px; line-height: 1.25; min-height: 2.4em; }
+        .card .actions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+        .card .actions button { padding: 6px 0; font-size: 0.72rem; border-radius: 8px; background: var(--surface2); color: var(--text); }
+        .card .actions button.active-A { background: var(--ok); color: #022C22; }
+        .card .actions button.active-AT { background: var(--late); color: #431407; }
+        .card .actions button.active-FJ { background: #A78BFA; color: #2E1065; }
+        .card .actions button.active-FI { background: var(--bad); color: #4C0519; }
+        .summary { display: none; margin: 16px 14px; padding: 16px; background: var(--surface); border-radius: var(--radius); border: 1px solid #334155; }
+        .summary.show { display: block; }
+        .summary h3 { margin-bottom: 12px; font-size: 1rem; }
+        .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; text-align: center; }
+        .summary-grid div { background: var(--bg); border-radius: 10px; padding: 12px 6px; }
+        .summary-grid .n { font-size: 1.4rem; font-weight: 800; }
+        .summary-grid .l { font-size: 0.7rem; color: var(--muted); }
+        .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(80px); background: #F8FAFC; color: #0F172A; padding: 12px 20px; border-radius: 12px; font-size: 0.88rem; font-weight: 600; max-width: 90%; box-shadow: 0 8px 30px rgba(0,0,0,0.4); opacity: 0; transition: transform 0.25s, opacity 0.25s; z-index: 50; }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        @media (max-width: 480px) { .kpi .n { font-size: 1rem; } .grid { grid-template-columns: repeat(2, 1fr); } }
     </style>
 </head>
 <body>
-    <div class="header">
-        <div>
-            <h1>📋 Asistencia — 2 CDD "A"</h1>
-            <div class="meta">Docente: Marcelo Fonseca · Ciencia de Datos · {{ hoy }}</div>
+    <header class="top">
+        <div class="brand">
+            <h1>Rapido<span>Lista</span></h1>
+            <div class="sub">2 CDD A · {{ hoy }} · Fonseca</div>
         </div>
-        <div class="meta">Objetivo: <strong>< 60 segundos</strong></div>
+        <div class="timer-box">
+            <div class="label">Tiempo de sesion</div>
+            <div class="value" id="timer">00:00</div>
+        </div>
+    </header>
+    <div class="controls">
+        <button class="btn-go" id="btnIniciar" onclick="iniciarSesion()">Iniciar lista</button>
+        <button class="btn-done" id="btnCerrar" onclick="cerrarSesion()" disabled>Cerrar acta</button>
+        <a href="/reporte" style="text-decoration:none"><button class="btn-ghost" type="button">Historial</button></a>
     </div>
-
-    <div class="container">
-        <div class="actions">
-            <button class="btn-primary" id="btnIniciar" onclick="iniciarSesion()">▶ Iniciar sesión (lista masiva)</button>
-            <button class="btn-success" id="btnCerrar" onclick="cerrarSesion()" disabled>✓ Cerrar y guardar</button>
-            <a href="/reporte" style="text-decoration:none"><button class="btn-secondary">📊 Reportes</button></a>
-            <div class="timer" id="timer">00:00</div>
-        </div>
-
-        <div class="status-bar" id="statusBar">
-            <div class="item">Estado: <strong id="estadoSesion">Sin sesión</strong></div>
-            <div class="item">Presentes (A): <strong id="countA">—</strong></div>
-            <div class="item">FJ: <strong id="countFJ">—</strong></div>
-            <div class="item">FI: <strong id="countFI">—</strong></div>
-            <div class="item">AT: <strong id="countAT">—</strong></div>
-            <div class="item">Total: <strong id="countTotal">{{ total }}</strong></div>
-        </div>
-
-        <table>
-            <thead>
-                <tr>
-                    <th class="num">N°</th>
-                    <th>Apellidos y Nombres</th>
-                    <th>Género</th>
-                    <th>Estado actual</th>
-                    <th>Cambiar estado</th>
-                </tr>
-            </thead>
-            <tbody id="tablaBody">
-                {% for est in estudiantes %}
-                <tr data-id="{{ est.id }}">
-                    <td class="num">{{ est.numero_lista }}</td>
-                    <td>{{ est.apellidos_nombres }}</td>
-                    <td>{{ est.genero }}</td>
-                    <td class="estado-cell">
-                        {% if registros_map.get(est.id) %}
-                            <span class="badge badge-{{ registros_map[est.id].estado }}">{{ registros_map[est.id].estado }}</span>
-                        {% else %}
-                            <span class="badge" style="background:#BBB">—</span>
-                        {% endif %}
-                    </td>
-                    <td>
-                        <div class="estado-btns">
-                            <button class="estado-A" onclick="marcar({{ est.id }}, 'A')" title="Asistencia">A</button>
-                            <button class="estado-FJ" onclick="marcar({{ est.id }}, 'FJ')" title="Falta Justificada">FJ</button>
-                            <button class="estado-FI" onclick="marcar({{ est.id }}, 'FI')" title="Falta Injustificada">FI</button>
-                            <button class="estado-AT" onclick="marcar({{ est.id }}, 'AT')" title="Atraso (≥15 min)">AT</button>
-                        </div>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-
-        <div class="resumen" id="resumenFinal" style="display:none;">
-            <div class="card"><div class="num" id="resA" style="color:var(--success)">0</div><div class="label">Asistencias (A)</div></div>
-            <div class="card"><div class="num" id="resFJ" style="color:var(--warning)">0</div><div class="label">Faltas Justificadas</div></div>
-            <div class="card"><div class="num" id="resFI" style="color:var(--danger)">0</div><div class="label">Faltas Injustificadas</div></div>
-            <div class="card"><div class="num" id="resAT" style="color:#E67E22">0</div><div class="label">Atrasos (AT)</div></div>
+    <div class="kpis">
+        <div class="kpi"><div class="n" id="estadoSesion">—</div><div class="l">Estado</div></div>
+        <div class="kpi a"><div class="n" id="countA">—</div><div class="l">Presentes</div></div>
+        <div class="kpi at"><div class="n" id="countAT">—</div><div class="l">Atrasos</div></div>
+        <div class="kpi fj"><div class="n" id="countFJ">—</div><div class="l">Justif.</div></div>
+        <div class="kpi fi"><div class="n" id="countFI">—</div><div class="l">Injust.</div></div>
+    </div>
+    <div class="grid-wrap">
+        <p class="hint">Al iniciar, todos quedan en <strong style="color:var(--ok)">Presente</strong>. Solo toca a quien tenga novedad.</p>
+        <div class="grid" id="grid">
+            {% for est in estudiantes %}
+            <div class="card" data-id="{{ est.id }}" data-estado="{% if registros_map.get(est.id) %}{{ registros_map[est.id].estado }}{% else %}—{% endif %}">
+                <div class="num">#{{ est.numero_lista }} · {{ est.genero[0] }}</div>
+                <div class="name">{{ est.apellidos_nombres }}</div>
+                <div class="actions">
+                    <button type="button" class="{% if registros_map.get(est.id) and registros_map[est.id].estado == 'A' %}active-A{% endif %}" onclick="marcar({{ est.id }}, 'A')">A</button>
+                    <button type="button" class="{% if registros_map.get(est.id) and registros_map[est.id].estado == 'AT' %}active-AT{% endif %}" onclick="marcar({{ est.id }}, 'AT')">AT</button>
+                    <button type="button" class="{% if registros_map.get(est.id) and registros_map[est.id].estado == 'FJ' %}active-FJ{% endif %}" onclick="marcar({{ est.id }}, 'FJ')">FJ</button>
+                    <button type="button" class="{% if registros_map.get(est.id) and registros_map[est.id].estado == 'FI' %}active-FI{% endif %}" onclick="marcar({{ est.id }}, 'FI')">FI</button>
+                </div>
+            </div>
+            {% endfor %}
         </div>
     </div>
-
+    <div class="summary" id="summary">
+        <h3>Acta cerrada</h3>
+        <div class="summary-grid">
+            <div><div class="n" id="resA" style="color:var(--ok)">0</div><div class="l">Presentes</div></div>
+            <div><div class="n" id="resAT" style="color:var(--late)">0</div><div class="l">Atrasos</div></div>
+            <div><div class="n" id="resFJ" style="color:#A78BFA">0</div><div class="l">Justificadas</div></div>
+            <div><div class="n" id="resFI" style="color:var(--bad)">0</div><div class="l">Injustificadas</div></div>
+        </div>
+    </div>
     <div class="toast" id="toast"></div>
-
     <script>
-        let timerInterval = null;
-        let startTime = null;
-        let sesionActiva = false;
-
+        let timerInterval = null, startTime = null, sesionActiva = false;
         function showToast(msg) {
             const t = document.getElementById('toast');
-            t.textContent = msg;
-            t.classList.add('show');
-            setTimeout(() => t.classList.remove('show'), 3000);
+            t.textContent = msg; t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3200);
         }
-
         function updateTimer() {
             if (!startTime) return;
             const elapsed = Math.floor((Date.now() - startTime) / 1000);
             const m = String(Math.floor(elapsed / 60)).padStart(2, '0');
             const s = String(elapsed % 60).padStart(2, '0');
-            document.getElementById('timer').textContent = `${m}:${s}`;
-            if (elapsed > 60) {
-                document.getElementById('timer').style.color = '#E74C3C';
-            }
+            const el = document.getElementById('timer');
+            el.textContent = m + ':' + s;
+            el.classList.toggle('over', elapsed > 60);
         }
-
+        function setCardEstado(card, estado) {
+            card.dataset.estado = estado;
+            card.querySelectorAll('.actions button').forEach(b => { b.className = ''; });
+            const map = { A: 'active-A', AT: 'active-AT', FJ: 'active-FJ', FI: 'active-FI' };
+            const btn = [...card.querySelectorAll('.actions button')].find(b => b.textContent === estado);
+            if (btn && map[estado]) btn.classList.add(map[estado]);
+        }
+        function updateCounts() {
+            const cards = document.querySelectorAll('.card');
+            let c = { A: 0, AT: 0, FJ: 0, FI: 0 };
+            cards.forEach(card => { const e = card.dataset.estado; if (c[e] !== undefined) c[e]++; });
+            document.getElementById('countA').textContent = c.A;
+            document.getElementById('countAT').textContent = c.AT;
+            document.getElementById('countFJ').textContent = c.FJ;
+            document.getElementById('countFI').textContent = c.FI;
+        }
         async function iniciarSesion() {
             try {
                 const res = await fetch('/api/iniciar-sesion', { method: 'POST' });
                 const data = await res.json();
                 if (!res.ok) throw new Error(data.detail || 'Error');
                 showToast(data.mensaje);
-                sesionActiva = true;
-                startTime = Date.now();
-                timerInterval = setInterval(updateTimer, 500);
+                sesionActiva = true; startTime = Date.now();
+                timerInterval = setInterval(updateTimer, 400);
                 document.getElementById('btnIniciar').disabled = true;
                 document.getElementById('btnCerrar').disabled = false;
                 document.getElementById('estadoSesion').textContent = 'Activa';
-                document.querySelectorAll('.estado-cell').forEach(cell => {
-                    cell.innerHTML = '<span class="badge badge-A">A</span>';
-                });
+                document.querySelectorAll('.card').forEach(card => setCardEstado(card, 'A'));
                 updateCounts();
-            } catch (e) {
-                showToast('Error: ' + e.message);
-            }
+            } catch (e) { showToast('Error: ' + e.message); }
         }
-
-        async function marcar(estudianteId, estado) {
-            if (!sesionActiva) {
-                showToast('Primero inicia la sesión');
-                return;
-            }
+        async function marcar(id, estado) {
+            if (!sesionActiva) { showToast('Primero inicia la lista'); return; }
             try {
                 const form = new FormData();
-                form.append('estudiante_id', estudianteId);
+                form.append('estudiante_id', id);
                 form.append('estado', estado);
-                if (estado === 'AT') {
-                    const now = new Date();
-                    form.append('hora_llegada', now.toTimeString().slice(0,5));
-                }
+                if (estado === 'AT') form.append('hora_llegada', new Date().toTimeString().slice(0, 5));
                 const res = await fetch('/api/marcar', { method: 'POST', body: form });
                 const data = await res.json();
                 if (!res.ok) throw new Error(data.detail || 'Error');
-                const row = document.querySelector(`tr[data-id="${estudianteId}"]`);
-                if (row) {
-                    row.querySelector('.estado-cell').innerHTML =
-                        `<span class="badge badge-${estado}">${estado}</span>`;
-                }
+                const card = document.querySelector('.card[data-id="' + id + '"]');
+                if (card) setCardEstado(card, estado);
                 updateCounts();
-            } catch (e) {
-                showToast('Error: ' + e.message);
-            }
+            } catch (e) { showToast('Error: ' + e.message); }
         }
-
-        function updateCounts() {
-            const badges = document.querySelectorAll('.estado-cell .badge');
-            let counts = {A:0, FJ:0, FI:0, AT:0};
-            badges.forEach(b => {
-                const e = b.textContent.trim();
-                if (counts[e] !== undefined) counts[e]++;
-            });
-            document.getElementById('countA').textContent = counts.A;
-            document.getElementById('countFJ').textContent = counts.FJ;
-            document.getElementById('countFI').textContent = counts.FI;
-            document.getElementById('countAT').textContent = counts.AT;
-        }
-
         async function cerrarSesion() {
-            if (!confirm('¿Cerrar la sesión de hoy? Se guardará el registro final.')) return;
+            if (!confirm('Cerrar el acta de hoy?')) return;
             try {
                 const res = await fetch('/api/cerrar-sesion', { method: 'POST' });
                 const data = await res.json();
                 if (!res.ok) throw new Error(data.detail || 'Error');
-                clearInterval(timerInterval);
-                sesionActiva = false;
+                clearInterval(timerInterval); sesionActiva = false;
                 document.getElementById('btnCerrar').disabled = true;
                 document.getElementById('estadoSesion').textContent = 'Cerrada';
                 const r = data.resumen;
-                document.getElementById('resumenFinal').style.display = 'grid';
+                document.getElementById('summary').classList.add('show');
                 document.getElementById('resA').textContent = r.asistencias;
+                document.getElementById('resAT').textContent = r.atrasos;
                 document.getElementById('resFJ').textContent = r.faltas_justificadas;
                 document.getElementById('resFI').textContent = r.faltas_injustificadas;
-                document.getElementById('resAT').textContent = r.atrasos;
-                let msg = `Sesión cerrada. A:${r.asistencias} FJ:${r.faltas_justificadas} FI:${r.faltas_injustificadas} AT:${r.atrasos}`;
+                let msg = 'Acta cerrada · A:' + r.asistencias + ' AT:' + r.atrasos + ' FJ:' + r.faltas_justificadas + ' FI:' + r.faltas_injustificadas;
                 if (r.tiempo_segundos != null) {
-                    msg += ` | Tiempo: ${r.tiempo_segundos}s`;
-                    if (r.tiempo_segundos <= 60) msg += ' ✅ ¡Objetivo cumplido!';
+                    msg += ' · ' + r.tiempo_segundos + 's';
+                    if (r.tiempo_segundos <= 60) msg += ' · Meta cumplida';
                 }
                 showToast(msg);
-            } catch (e) {
-                showToast('Error: ' + e.message);
-            }
+            } catch (e) { showToast('Error: ' + e.message); }
         }
-
         (async function init() {
             try {
                 const res = await fetch('/api/sesion-hoy');
                 const data = await res.json();
-                if (data.existe) {
-                    document.getElementById('estadoSesion').textContent = data.estado;
-                    if (data.estado === 'Activa') {
-                        sesionActiva = true;
-                        document.getElementById('btnIniciar').disabled = true;
-                        document.getElementById('btnCerrar').disabled = false;
-                        startTime = Date.now() - 10000;
-                        timerInterval = setInterval(updateTimer, 500);
-                    }
-                    data.registros.forEach(r => {
-                        const row = document.querySelector(`tr[data-id="${r.estudiante_id}"]`);
-                        if (row) {
-                            row.querySelector('.estado-cell').innerHTML =
-                                `<span class="badge badge-${r.estado}">${r.estado}</span>`;
-                        }
-                    });
-                    updateCounts();
+                if (!data.existe) { document.getElementById('estadoSesion').textContent = 'Sin acta'; return; }
+                document.getElementById('estadoSesion').textContent = data.estado;
+                if (data.estado === 'Activa') {
+                    sesionActiva = true;
+                    document.getElementById('btnIniciar').disabled = true;
+                    document.getElementById('btnCerrar').disabled = false;
+                    startTime = Date.now() - 8000;
+                    timerInterval = setInterval(updateTimer, 400);
                 }
-            } catch(e) {}
+                data.registros.forEach(function(r) {
+                    const card = document.querySelector('.card[data-id="' + r.estudiante_id + '"]');
+                    if (card) setCardEstado(card, r.estado);
+                });
+                updateCounts();
+            } catch (e) {}
         })();
-
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/static/sw.js').catch(() => {});
-        }
+        if ('serviceWorker' in navigator) navigator.serviceWorker.register('/static/sw.js').catch(function() {});
     </script>
 </body>
 </html>

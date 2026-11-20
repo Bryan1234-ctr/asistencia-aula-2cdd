@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reportes de Asistencia — 2 CDD "A"</title>
+    <style>
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: #F4F6F7; margin: 0; }
+        .header { background: #1F4E79; color: white; padding: 14px 20px; }
+        .header a { color: #AED6F1; }
+        .container { max-width: 900px; margin: 20px auto; padding: 0 16px; }
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+        th { background: #1F4E79; color: white; padding: 10px; text-align: left; }
+        td { padding: 10px; border-bottom: 1px solid #EEE; }
+        .badge { padding: 3px 8px; border-radius: 10px; font-size: 0.8rem; font-weight: 600; }
+        .ok { background: #D5F5E3; color: #1E8449; }
+        .late { background: #FADBD8; color: #922B21; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📊 Reportes de Asistencia</h1>
+        <a href="/">← Volver a toma de asistencia</a>
+    </div>
+    <div class="container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Estado</th>
+                    <th>Hora inicio</th>
+                    <th>Hora cierre</th>
+                    <th>Tiempo (s)</th>
+                    <th>Presentes</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in sesiones %}
+                <tr>
+                    <td>{{ s.fecha.strftime('%d/%m/%Y') }}</td>
+                    <td>{{ s.estado }}</td>
+                    <td>{{ s.hora_inicio or '—' }}</td>
+                    <td>{{ s.hora_cierre or '—' }}</td>
+                    <td>
+                        {% if s.tiempo_total_segundos is not none %}
+                            <span class="badge {{ 'ok' if s.tiempo_total_segundos <= 60 else 'late' }}">
+                                {{ s.tiempo_total_segundos }}s
+                            </span>
+                        {% else %}—{% endif %}
+                    </td>
+                    <td>{{ s.total_presentes }} / {{ s.total_esperados }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="6" style="text-align:center;color:#888">Aún no hay sesiones registradas</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

@@ -1,11 +1,11 @@
 {
-  "name": "Asistencia 2 CDD A",
-  "short_name": "Asistencia",
-  "description": "Toma de asistencia en menos de 1 minuto - Curso 2 CDD A",
+  "name": "RapidoLista 2 CDD A",
+  "short_name": "RapidoLista",
+  "description": "Toma de asistencia en menos de 60 segundos - Curso 2 CDD A",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#1F4E79",
-  "theme_color": "#1F4E79",
+  "background_color": "#0F172A",
+  "theme_color": "#0F172A",
   "orientation": "portrait-primary",
   "icons": [
     {
